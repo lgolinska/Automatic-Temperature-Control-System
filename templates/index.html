@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UAR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="navbar">
+      <a href="{{ url_for('index') }}">Strona główna</a>
+      <a href="{{ url_for('model') }}">Model</a>
+    </div>
+    <div>
+      <h1>UAR - OGRZEWANIE POMIESZCZENIA</h1>
+      <form method="POST" action="/">
+        <label for="volume">Objętość pomieszczenia (m³):</label>
+        <select id="volume" name="volume" onchange="updateVolumeOptions(this.value)">
+          <option value="50" {% if volume == 50 %}selected{% endif %}>50</option>
+          <option value="100" {% if volume == 100 %}selected{% endif %}>100</option>
+          <option value="500" {% if volume == 500 %}selected{% endif %}>500</option>
+          <option value="1000" {% if volume == 1000 %}selected{% endif %}>1000</option>
+          <option value="10000" {% if volume == 10000 %}selected{% endif %}>10000</option>
+        </select><br />
+
+        <label for="zad_temperature">Temperatura docelowa (°C):</label>
+        <select id="zad_temperature" name="zad_temperature">
+          {% for i in range(18, 26) %}
+          <option value="{{ i }}" {% if zad_temperature == i %}selected{% endif %}>{{ i }}</option>
+          {% endfor %}
+        </select><br />
+
+        <label for="temperature">Temperatura zewnętrzna (°C)</label>
+            <input type="range" id="temperature" name="temperature" value="{{ temperature }}" oninput="updateTemperatureValue(this.value)">
+            <span id="temperature_value">{{ temperature }}</span><br />
+
+        <label for="kp">Kp (wzmocnienie regulatora):</label>
+            <input type="range" id="kp" name="kp" value="{{ kp }}" oninput="updateKpValue(this.value)">
+            <span id="kp_value">{{ kp }}</span><br />
+
+            <label for="Ti">Ti (czas zdwojenia):</label>
+            <input type="range" id="Ti" name="Ti" value="{{ Ti }}" oninput="updateTiValue(this.value)">
+            <span id="Ti_value">{{ Ti }}</span><br />
+
+        <button type="submit" class="custom-btn">Aktualizuj wykres</button>
+      </form>
+    </div>
+
+    <script>
+      const kpOptions = {
+          50: {min: 0.001, max: 0.01, step: 0.001},
+          100: {min: 0.001, max: 0.01, step: 0.001},
+          500: {min: 0.001, max: 0.01, step: 0.001},
+          1000: {min: 0.001, max: 0.01, step: 0.001},
+          10000: {min: 0.001, max: 0.01, step: 0.001}, 
+      };
+
+      const TiOptions = {
+          50: {min: 0.5, max: 10, step: 0.5},
+          100: {min: 0.5, max: 10, step: 0.5},
+          500: {min: 1, max: 20, step: 1},
+          1000: {min: 5, max: 50, step: 5},
+          10000: {min: 10, max: 70, step: 5},
+      };
+
+      function updateVolumeOptions(selectedVolume) {
+          const kp = document.getElementById("kp");
+          const Ti = document.getElementById("Ti");
+          const temperature = document.getElementById("temperature");
+
+          const kpOption = kpOptions[selectedVolume];
+          const TiOption = TiOptions[selectedVolume];
+
+          kp.setAttribute("min", kpOption.min);
+          kp.setAttribute("max", kpOption.max);
+          kp.setAttribute("step", kpOption.step);
+
+          Ti.setAttribute("min", TiOption.min);
+          Ti.setAttribute("max", TiOption.max);
+          Ti.setAttribute("step", TiOption.step);
+
+          temperature.setAttribute("min", 10);
+          temperature.setAttribute("max", 18);
+          temperature.setAttribute("step", 1);
+
+          updateKpValue(kp.value);
+          updateTiValue(Ti.value);
+          updateTemperatureValue(temperature.value);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+          const selectedVolume = document.getElementById("volume").value;
+          updateVolumeOptions(selectedVolume);
+
+          const kp = document.getElementById("kp");
+          const Ti = document.getElementById("Ti");
+          const temperature = document.getElementById("temperature");
+
+            kp.value = "{{ kp }}";
+            Ti.value = "{{ Ti }}";
+            temperature.value = "{{ temperature }}";
+
+            updateKpValue(kp.value);
+            updateTiValue(Ti.value);
+            updateTemperatureValue(temperature.value);
+        });
+
+        function updateKpValue(value) {
+            document.getElementById("kp_value").textContent = value;
+        }
+
+        function updateTiValue(value) {
+            document.getElementById("Ti_value").textContent = value;
+        }
+
+        function updateTemperatureValue(value) {
+            document.getElementById("temperature_value").textContent = value;
+        }
+    </script>
+
+    {% if graph_html %}
+    <div>{{ graph_html | safe }}</div>
+    {% else %}
+    <p class="information">
+      Wybierz objętość pomieszczenia, temperaturę na zewnątrz oraz docelową temperaturę. Następnie dobierz wzmocnienie regulatora i czas wzmocnienia. Kliknij "Aktualizuj wykres", aby wyświetlić wykresy.
+    </p>
+    {% endif %}
+  </body>
+</html>

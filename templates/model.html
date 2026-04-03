@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Model</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js"
+      onload="renderMathInElement(document.body);"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="navbar">
+      <a href="{{ url_for('index') }}">Strona główna</a>
+      <a href="{{ url_for('model') }}">Model</a>
+    </div>
+
+    <div class="module_page">
+      <div>
+        <h1>Model</h1>
+        <div>
+          \[\\[2em]\]
+          Bilans cieplny pomieszczenia:
+          \[ Q(t)=c_{p}\cdot \rho \cdot V \cdot T(t) , gdzie: \] \[\]
+          \(Q(t)\) - ciepło w chwili t \([J]\) \[\]
+          \(c_{p}\) - ciepło właściwe (powietrza)\([\frac{J}{Kg \cdot K}]\) \[\]
+          \(\rho\) - gęstość (powietrza) \([\frac{Kg}{m^{3}}]\) \[\]
+          \(V\) - objętość pomieszczenia \([m^{3}]\) \[\]
+          \(T(t)\) - temperatura w pomieszczeniu w chwili t \([K]\) \[\]
+
+          \[\\[2em]\]
+          Dla danego pomieszczenia iloczyn \(c_{p}\cdot \rho \cdot V\) jest stałą, oznaczamy ją jako \(C_v\):
+          \[C_v=c_{p}\cdot \rho \cdot V \] 
+          \[C_v \frac{dT(t)}{dt} = Q_{\text{dostarczane}}(t) - Q_{\text{tracone}}(t) \]
+          
+          \[\\[2em]\]
+          Ciepło tracone:
+          \[ Q_{\text{tracone}}(t)=K_{c} \cdot (T_{w}(t)-T_{zew}(t)) , gdzie:  \] \[\]
+          \(K_{c}\) - współczynnik przenikania ciepła \([\frac{W}{K}]\) \[\]
+          \(T_{w}(t)\) - temperatura w pomieszczeniu w chwili t \([K]\) \[\]
+          \(T_{zew}(t)\) - temperatura zewnętrzna w chwili t \([K]\) \[\]
+          
+          \[\\[2em]\]
+          Ciepło dostarczane przez grzejnik:
+          \[ Q_{\text{dostarczane}}(t)=P_{max} \cdot u(t) , gdzie:  \] \[\]
+          \(P_{max} \) - maksymalna moc grzewcza \([W]\) \[\]
+          \(u(t)\) - sygnał sterujący \((0\leq u(t) \leq 1)\)\[\]
+
+          \[\\[2em]\]
+          Ostatecznie otrzymujemy:
+          \[ C_v \frac{dT(t)}{dt}=P_{max} \cdot u(t) -  K_{c} \cdot (T_{w}(t)-T_{zew}(t)) \] \[\]
+
+          Równanie różnicowe:
+          \[ \frac{\Delta T(t)}{T_{p}}=\frac{1}{C_v} \cdot(P_{max} \cdot u(t) -  K_{c} \cdot (T_{w}(t)-T_{zew}(t))) \] \[\]
+          
+          Rozwiązanie równania różnicowego - rekurencja:
+          \[\begin{cases} T_{w}(0) = T_{zew}
+          \\ T_{w}(n+1) = \frac{T_{p}}{C_v} \cdot(P_{max} \cdot u(t) -  K_{c} \cdot (T_{w}(t)-T_{zew}(t))) + T_{w}(n) 
+          \end{cases} \] 
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
